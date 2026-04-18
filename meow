@@ -1,0 +1,128 @@
+package week4;
+
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import javax.swing.*;
+import javax.swing.border.LineBorder;
+
+public class McDoLiBeeRegister extends JFrame implements ActionListener {
+    
+    private JLabel lblHeader, lblTotal;
+    private JTextField txtFriesQty, txtBurgerQty, txtChickenQty, txtSoftdrinksQty;
+    private JButton btnAddFries, btnMinFries, btnAddBurger, btnMinBurger;
+    private JButton btnAddChicken, btnMinChicken, btnAddSoft, btnMinSoft;
+    private JButton btnCalculate, btnVoid; 
+    private JTextArea txaSummary;
+    
+    private int qFries = 0, qBurger = 0, qChicken = 0, qSoft = 0;
+    private final double pFries = 2.00, pBurger = 2.50, pChicken = 3.00, pSoft = 1.00;
+
+    public McDoLiBeeRegister() {
+        setTitle("McDoLiBee Register");
+        setSize(700, 500);
+        setLayout(null);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        getContentPane().setBackground(new Color(240, 240, 240));
+
+        lblHeader = new JLabel("McDoLiBee Register", SwingConstants.CENTER);
+        lblHeader.setFont(new Font("Arial", Font.BOLD, 24));
+        lblHeader.setBounds(0, 20, 700, 40);
+        add(lblHeader);
+
+        // Menu Rows
+        createMenuRow("Fries", 100, pFries, btnAddFries = new JButton("+"), btnMinFries = new JButton("-"), txtFriesQty = new JTextField("0"));
+        createMenuRow("Burger", 140, pBurger, btnAddBurger = new JButton("+"), btnMinBurger = new JButton("-"), txtBurgerQty = new JTextField("0"));
+        createMenuRow("Fried Chicken", 180, pChicken, btnAddChicken = new JButton("+"), btnMinChicken = new JButton("-"), txtChickenQty = new JTextField("0"));
+        createMenuRow("Softdrinks", 220, pSoft, btnAddSoft = new JButton("+"), btnMinSoft = new JButton("-"), txtSoftdrinksQty = new JTextField("0"));
+
+        // Order Summary (Green Box)
+        txaSummary = new JTextArea();
+        txaSummary.setBounds(400, 100, 250, 180);
+        txaSummary.setBackground(new Color(34, 139, 34)); 
+        txaSummary.setForeground(Color.WHITE);
+        txaSummary.setEditable(false);
+        add(txaSummary);
+
+        // --- BUTTONS ---
+        btnVoid = new JButton("Void Order");
+        btnVoid.setBounds(50, 300, 120, 40);
+        btnVoid.setBackground(new Color(255, 100, 100));
+        add(btnVoid);
+
+        btnCalculate = new JButton("Magkano Lahat?");
+        btnCalculate.setBounds(180, 300, 150, 40);
+        add(btnCalculate);
+
+        // --- TOTAL (Middle of buttons, at bottom, with rectangle border) ---
+        // Calculating horizontal middle: (50 + (180 + 150)) / 2 = 190. 
+        // We set width to 150, so x = 190 - (150/2) = 115
+        lblTotal = new JLabel("$0.00", SwingConstants.CENTER);
+        lblTotal.setFont(new Font("Courier New", Font.BOLD, 20));
+        lblTotal.setBounds(100, 360, 150, 40); 
+        
+        // Creating the rectangle border
+        lblTotal.setBorder(new LineBorder(Color.BLACK, 2));
+        lblTotal.setOpaque(true);
+        lblTotal.setBackground(Color.WHITE);
+        add(lblTotal);
+        
+        JLabel lblTotalText = new JLabel("Total:");
+        lblTotalText.setBounds(50, 360, 50, 40);
+        add(lblTotalText);
+
+        // Listeners
+        btnCalculate.addActionListener(this);
+        btnVoid.addActionListener(this);
+        JButton[] controls = {btnAddFries, btnMinFries, btnAddBurger, btnMinBurger, btnAddChicken, btnMinChicken, btnAddSoft, btnMinSoft};
+        for (JButton b : controls) b.addActionListener(this);
+    }
+
+    private void createMenuRow(String name, int y, double price, JButton addBtn, JButton minBtn, JTextField qtyField) {
+        JLabel lblName = new JLabel(name); lblName.setBounds(50, y, 100, 30); add(lblName);
+        addBtn.setBounds(160, y, 45, 30); add(addBtn);
+        minBtn.setBounds(210, y, 45, 30); add(minBtn);
+        qtyField.setBounds(270, y, 40, 30); qtyField.setHorizontalAlignment(JTextField.CENTER); add(qtyField);
+        JLabel lblPrice = new JLabel("x  $" + String.format("%.2f", price)); lblPrice.setBounds(320, y, 100, 30); add(lblPrice);
+    }
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        if (e.getSource() == btnAddFries) qFries++;
+        if (e.getSource() == btnMinFries && qFries > 0) qFries--;
+        if (e.getSource() == btnAddBurger) qBurger++;
+        if (e.getSource() == btnMinBurger && qBurger > 0) qBurger--;
+        if (e.getSource() == btnAddChicken) qChicken++;
+        if (e.getSource() == btnMinChicken && qChicken > 0) qChicken--;
+        if (e.getSource() == btnAddSoft) qSoft++;
+        if (e.getSource() == btnMinSoft && qSoft > 0) qSoft--;
+
+        txtFriesQty.setText(String.valueOf(qFries));
+        txtBurgerQty.setText(String.valueOf(qBurger));
+        txtChickenQty.setText(String.valueOf(qChicken));
+        txtSoftdrinksQty.setText(String.valueOf(qSoft));
+
+        if (e.getSource() == btnCalculate) {
+            double total = (qFries * pFries) + (qBurger * pBurger) + (qChicken * pChicken) + (qSoft * pSoft);
+            String summary = " ORDER SUMMARY:\n\n";
+            if (qFries > 0) summary += " " + qFries + " x Fries = $" + String.format("%.2f", qFries * pFries) + "\n";
+            if (qBurger > 0) summary += " " + qBurger + " x Burger = $" + String.format("%.2f", qBurger * pBurger) + "\n";
+            if (qChicken > 0) summary += " " + qChicken + " x Chicken = $" + String.format("%.2f", qChicken * pChicken) + "\n";
+            if (qSoft > 0) summary += " " + qSoft + " x Soft = $" + String.format("%.2f", qSoft * pSoft) + "\n";
+            
+            txaSummary.setText(summary);
+            lblTotal.setText("$" + String.format("%.2f", total));
+        }
+
+        if (e.getSource() == btnVoid) {
+            qFries = 0; qBurger = 0; qChicken = 0; qSoft = 0;
+            txtFriesQty.setText("0"); txtBurgerQty.setText("0"); txtChickenQty.setText("0"); txtSoftdrinksQty.setText("0");
+            txaSummary.setText("");
+            lblTotal.setText("$0.00");
+        }
+    }
+
+    public static void main(String[] args) {
+        new McDoLiBeeRegister().setVisible(true);
+    }
+}
